@@ -1,0 +1,11 @@
+{
+  "name": "KynnonNet Internet Fibra Óptica",
+  "short_name": "KynnonNet",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070b0d",
+  "theme_color": "#070b0d",
+  "description": "Planos de internet 100% fibra óptica, cobertura e atendimento rápido.",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
