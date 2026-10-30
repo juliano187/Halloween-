@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KynnonNet | Internet 100% Fibra Óptica</title>
+<meta name="description" content="Internet ultrarápida 100% fibra óptica, sem franquia e com suporte rápido. Consulte a cobertura.">
+<meta property="og:image" content="https://raw.githubusercontent.com/juliano187/Halloween-/refs/heads/main/icon.png">
+<meta property="og:image:type" content="image/png">
+<!-- PWA: manifest e ícone (arquivos manifest.json, sw.js e icon.svg na mesma pasta) -->
+<meta name="theme-color" content="#070b0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { kn: { bg:'#070b0d', panel:'#0e1519', green:'#10B981', mint:'#34d399', cyan:'#06b6d4', red:'#EF4444' } },
+    fontFamily: { display:['Plus Jakarta Sans','sans-serif'], sans:['Inter','sans-serif'] }
+  } } }
+</script>
+
+<style>
+  body{background:#070d08;color:#e8f0ee;overflow-x:hidden}
+  ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:#070b0d}
+  ::-webkit-scrollbar-thumb{background:#10B981;border-radius:5px}
+  .glass{background:rgba(14,21,25,.72);backdrop-filter:blur(12px);border:1px solid rgba(16,185,129,.18)}
+  .glow-text{text-shadow:0 0 22px rgba(16,185,129,.45)}
+  @keyframes pulseGlow{0%,100%{box-shadow:0 0 18px rgba(16,185,129,.45)}50%{box-shadow:0 0 38px rgba(6,182,212,.7)}}
+  .pulse-glow{animation:pulseGlow 3s infinite ease-in-out}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .float{animation:floaty 4s infinite ease-in-out}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="relative font-sans">
+
+<!-- Canvas de fundo: pulsos de luz viajando em fibra + névoa colorida -->
+<canvas id="bg" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+<!-- Banner de instalação do PWA (aparece só quando o navegador permite instalar) -->
+<div id="pwaBanner" class="hidden fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-kn-green to-kn-cyan text-black py-2 px-4 flex items-center justify-between text-sm font-semibold shadow-lg">
+  <span><i class="fa-solid fa-bolt mr-2"></i>Instale o app KynnonNet e acesse a qualquer hora!</span>
+  <div class="flex gap-2">
+    <button onclick="installPwa()" class="bg-black text-kn-mint px-3 py-1 rounded-full text-xs font-extrabold">INSTALAR</button>
+    <button onclick="pwaBanner.classList.add('hidden')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+</div>
+
+<!-- HEADER: logo, menu desktop, CTA e hambúrguer (com os botões das centrais) -->
+<header class="sticky top-0 z-40 glass border-x-0 border-t-0">
+  <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="#inicio" class="flex items-center gap-2 font-display font-extrabold text-xl">
+      <img src="icon.svg" alt="" class="w-8 h-8"> KynnonNet
+    </a>
+    <nav class="hidden md:flex gap-7 text-sm font-semibold text-gray-300">
+      <a href="#inicio" class="hover:text-kn-mint">Início</a>
+      <a href="#planos" class="hover:text-kn-mint">Planos</a>
+      <a href="#cobertura" class="hover:text-kn-mint">Cobertura</a>
+      <a href="#depoimentos" class="hover:text-kn-mint">Depoimentos</a>
+      <a href="#contato" class="hover:text-kn-mint">Contato</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <button id="navPwa" onclick="installPwa()" class="hidden sm:inline-flex border border-kn-mint text-kn-mint text-xs font-bold px-3 py-2 rounded-lg hover:bg-kn-mint hover:text-black"><i class="fa-solid fa-download mr-1"></i>APP</button>
+      <a href="#planos" class="hidden sm:inline-block bg-gradient-to-r from-kn-green to-kn-cyan text-black font-extrabold text-sm px-5 py-2.5 rounded-full hover:-translate-y-0.5 transition">Assinar Agora</a>
+      <button id="menuBtn" class="md:hidden text-2xl text-kn-mint" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+
+  <!-- MENU HAMBÚRGUER (mobile): navegação + Central Tamandaré + Central Araucária -->
+  <div id="mobileMenu" class="hidden md:hidden border-t border-kn-green/20 px-4 pt-3 pb-6 space-y-1">
+    <a href="#inicio" class="mm block py-2.5 font-medium">Início</a>
+    <a href="#planos" class="mm block py-2.5 font-medium">Planos</a>
+    <a href="#cobertura" class="mm block py-2.5 font-medium">Cobertura</a>
+    <a href="#depoimentos" class="mm block py-2.5 font-medium">Depoimentos</a>
+    <a href="#contato" class="mm block py-2.5 font-medium">Contato</a>
+    <p class="text-[11px] uppercase tracking-widest text-gray-400 font-bold pt-3">Fale com sua central</p>
+    <div class="grid grid-cols-2 gap-3 pt-1">
+      <a data-central="tamandare" target="_blank" rel="noopener" class="text-center bg-gradient-to-br from-kn-green to-emerald-700 rounded-xl py-3.5 text-sm font-bold"><i class="fa-solid fa-location-dot block text-lg mb-1"></i>Central Tamandaré</a>
+      <a data-central="araucaria" target="_blank" rel="noopener" class="text-center bg-gradient-to-br from-kn-cyan to-violet-600 rounded-xl py-3.5 text-sm font-bold"><i class="fa-solid fa-location-dot block text-lg mb-1"></i>Central Araucária</a>
+    </div>
+    <a href="#planos" class="mm block text-center bg-kn-green text-black font-extrabold py-3 rounded-xl mt-3">Assinar Agora</a>
+  </div>
+</header>
+
+<main class="relative z-10">
+
+  <!-- HERO: título, subtítulo, "velocímetro" animado e CTAs -->
+  <section id="inicio" class="min-h-[88vh] flex flex-col items-center justify-center text-center px-4 py-16 relative">
+    <div class="absolute top-1/4 left-10 text-6xl opacity-20 float hidden lg:block text-kn-green"><i class="fa-solid fa-wifi"></i></div>
+    <div class="absolute bottom-10 right-10 text-7xl opacity-20 float hidden lg:block text-kn-cyan" style="animation-delay:2s"><i class="fa-solid fa-bolt"></i></div>
+    <div class="max-w-4xl mx-auto space-y-6">
+      <span class="inline-flex items-center gap-2 bg-kn-green/10 border border-kn-green/40 rounded-full px-4 py-1.5 text-xs sm:text-sm text-kn-mint font-bold uppercase tracking-wider"><i class="fa-solid fa-circle-check"></i> 100% Fibra Óptica</span>
+      <h1 class="font-display font-extrabold text-4xl sm:text-6xl lg:text-7xl leading-tight">
+        Internet <span class="bg-gradient-to-r from-kn-green via-kn-cyan to-violet-400 bg-clip-text text-transparent glow-text">ultrarápida</span> que nunca deixa você na mão
+      </h1>
+      <p class="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto">Estabilidade de verdade, navegação ilimitada e suporte rápido e humanizado. Conecte-se à velocidade da luz.</p>
+
+      <div class="pt-4">
+        <p class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">Desempenho ilustrativo da nossa rede</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto" id="stats"></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+        <a href="#cobertura" class="pulse-glow bg-gradient-to-r from-kn-green to-kn-cyan text-black font-extrabold text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3"><i class="fa-solid fa-location-crosshairs"></i> Consulte sua Cobertura</a>
+        <a href="#planos" class="glass hover:bg-white/5 font-bold px-6 py-4 rounded-2xl flex items-center justify-center gap-2">Ver Planos <i class="fa-solid fa-arrow-down text-sm"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- COBERTURA: consulta por CEP (resultado abre no modal) -->
+  <section id="cobertura" class="px-4 py-12 max-w-3xl mx-auto">
+    <div class="glass rounded-3xl p-6 sm:p-8 text-center">
+      <h2 class="font-display font-extrabold text-2xl">A KynnonNet chega até você?</h2>
+      <p class="text-gray-400 text-sm mt-1 mb-5">Atendemos <b class="text-kn-mint">Almirante Tamandaré</b> e <b class="text-kn-mint">Araucária</b>. Digite seu CEP e confira.</p>
+      <form id="cepForm" class="flex flex-col sm:flex-row gap-3">
+        <input id="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="Seu CEP (ex: 83500-000)" class="flex-1 bg-black/50 border border-kn-green/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-kn-green">
+        <button id="cepBtn" class="bg-kn-green text-black font-extrabold px-6 py-3 rounded-xl hover:bg-kn-mint transition">Verificar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- PLANOS: cards gerados a partir da lista "plans" no script -->
+  <section id="planos" class="px-4 py-20 max-w-7xl mx-auto">
+    <div class="text-center mb-14">
+      <h2 class="font-display font-extrabold text-3xl sm:text-5xl">Escolha sua velocidade</h2>
+      <p class="text-gray-400 mt-2 text-sm sm:text-base">Instalação de fibra e Wi-Fi de qualidade em todos os planos.</p>
+    </div>
+    <div id="plansGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch"></div>
+  </section>
+
+  <!-- SIMULADOR: recomenda o plano ideal (interatividade de conversão) -->
+  <section id="simulador" class="px-4 py-12 max-w-4xl mx-auto">
+    <div class="glass rounded-3xl p-6 sm:p-10 border-kn-cyan/40">
+      <span class="text-xs font-bold uppercase tracking-widest text-kn-cyan">Simulador</span>
+      <h2 class="font-display font-extrabold text-2xl sm:text-4xl my-2">Qual plano combina com você?</h2>
+      <label class="block text-sm text-gray-300 mt-4">Pessoas/dispositivos conectados: <b id="pplOut" class="text-kn-mint">3</b></label>
+      <input id="ppl" type="range" min="1" max="10" value="3" class="w-full accent-emerald-500">
+      <div class="flex flex-wrap gap-3 mt-4 text-sm">
+        <label class="glass rounded-xl px-4 py-2 cursor-pointer"><input type="checkbox" value="game" class="sim mr-2 accent-emerald-500">Jogos online</label>
+        <label class="glass rounded-xl px-4 py-2 cursor-pointer"><input type="checkbox" value="k4" class="sim mr-2 accent-emerald-500">Filmes em 4K</label>
+        <label class="glass rounded-xl px-4 py-2 cursor-pointer"><input type="checkbox" value="work" class="sim mr-2 accent-emerald-500">Home office</label>
+      </div>
+      <div id="simResult" class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-black/40 rounded-2xl p-5 border border-kn-green/30"></div>
+    </div>
+  </section>
+
+  <!-- DIFERENCIAIS -->
+  <section class="px-4 py-16 max-w-7xl mx-auto">
+    <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-center mb-12">Por que a KynnonNet?</h2>
+    <div id="diffGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section id="depoimentos" class="px-4 py-16 max-w-7xl mx-auto">
+    <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-center mb-12">Quem é KynnonNet, aprova</h2>
+    <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+  </section>
+
+  <!-- FAQ: acordeão -->
+  <section id="faq" class="px-4 py-16 max-w-3xl mx-auto">
+    <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-center mb-10">Dúvidas frequentes</h2>
+    <div id="faqList" class="space-y-3"></div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer id="contato" class="glass border-x-0 border-b-0 py-12 px-4 relative z-10">
+  <div class="max-w-7xl mx-auto grid gap-8 md:grid-cols-3 text-sm text-gray-400">
+    <div>
+      <div class="flex items-center gap-2 font-display font-extrabold text-xl text-white"><img src="icon.svg" alt="" class="w-8 h-8"> KynnonNet</div>
+      <p class="mt-3 max-w-xs">Internet fibra óptica de alta performance, com transparência e suporte de verdade.</p>
+      <div class="flex gap-4 text-xl mt-4 text-gray-300">
+        <a href="#" aria-label="Instagram" class="hover:text-kn-mint"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook" class="hover:text-kn-mint"><i class="fa-brands fa-facebook"></i></a>
+        <a data-central="geral" target="_blank" rel="noopener" aria-label="WhatsApp" class="hover:text-kn-mint"><i class="fa-brands fa-whatsapp"></i></a>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <h3 class="text-white font-bold mb-2">Links úteis</h3>
+      <a href="#planos" class="block hover:text-white">Planos</a>
+      <a href="#cobertura" class="block hover:text-white">Cobertura</a>
+      <a href="#" class="block hover:text-white">Termos de uso</a>
+      <a href="#" class="block hover:text-white">Política de privacidade</a>
+    </div>
+    <div class="space-y-2">
+      <h3 class="text-white font-bold mb-2">Contato</h3>
+      <a data-central="tamandare" target="_blank" rel="noopener" class="block hover:text-white">Central Tamandaré</a>
+      <a data-central="araucaria" target="_blank" rel="noopener" class="block hover:text-white">Central Araucária</a>
+      <a href="tel:+5541997169772" class="block hover:text-white">(41) 99716-9772</a>
+      <a href="mailto:kynnonnet@gmail.com" class="block hover:text-white">contato@kynnonnet</a>
+      <p>Rua jose real prado,  — tamandaré</p>
+    </div>
+  </div>
+  <p class="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-xs text-gray-500 flex flex-wrap justify-between gap-2"><span>© 2026 KynnonNet. Todos os direitos reservados.</span><span>CNPJ 00.000.000/0001-00</span></p>
+</footer>
+
+<!-- MODAL de resultado da cobertura -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-sm w-full text-center space-y-3 relative border-kn-green">
+    <button onclick="modal.classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    <div id="modalIcon" class="text-5xl text-kn-mint"><i class="fa-solid fa-circle-check"></i></div>
+    <h3 id="modalTitle" class="font-display font-extrabold text-2xl">Boa notícia!</h3>
+    <p id="modalMsg" class="text-gray-300 text-sm"></p>
+    <a id="modalWa" target="_blank" rel="noopener" class="block bg-gradient-to-r from-kn-green to-kn-cyan text-black font-extrabold py-3 rounded-xl">Falar no WhatsApp</a>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   CONFIGURAÇÃO — EDITE AQUI os números de WhatsApp (DDI + DDD + número, só dígitos)
+   ============================================================= */
+const CONFIG = {
+
+  geral:     '5541997169772',  // WhatsApp principal (planos, modal, rodapé)
+
+  tamandare: 'https://kynnonnet.beesweb.com.br/login',  // Botão "Central Tamandaré" (menu hambúrguer e rodapé)
+
+  araucaria: 'https://kynnonnetcapela.beesweb.com.br/login',   // Botão "Central Araucária" (menu hambúrguer e rodapé)
+
+};
+const wa = (num, msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+
+// Aplica os links das centrais em todo elemento com data-central
+document.querySelectorAll('[data-central]').forEach(a => {
+  const k = a.dataset.central;
+  
+  if (k === 'geral') {
+    // Mantém o WhatsApp apenas para o geral
+    const nome = 'a KynnonNet';
+    a.href = wa(CONFIG[k], `Olá, quero falar com ${nome}`);
+  } else {
+    // Usa a URL direta cadastrada no CONFIG para tamandare e araucaria
+    a.href = CONFIG[k];
+  }
+});
+
+/* ---------- Menu hambúrguer ---------- */
+const mobileMenu = document.getElementById('mobileMenu');
+document.getElementById('menuBtn').addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+document.querySelectorAll('.mm').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+/* ---------- Dados: planos, diferenciais, depoimentos, FAQ ---------- */
+const plans = [
+  { mb:100, price:'79,90', cta:'Contratar Agora', f:['Wi-Fi grátis','100% Fibra Óptica','Download/Upload simétrico','Suporte técnico'] },
+  { mb:200, price:'89,90', cta:'Contratar Agora', f:['Wi-Fi de alta performance','Ideal para redes sociais e streaming HD','Instalação inclusa'] },
+  { mb:400, price:'99,90', cta:'Contratar 400 Mega', badge:['Mais Vendido','from-kn-green to-kn-cyan text-black'], hot:true, f:['Wi-Fi Dual Band','Perfeito para jogos online e filmes em 4K','Múltiplos dispositivos'] },
+  { mb:500, price:'110,00', cta:'Contratar 500 Mega', badge:['Ultra Performance','from-kn-red to-orange-500 text-white'], f:['Wi-Fi 6 / Alta velocidade','Home office, downloads pesados e famílias grandes'] }
+];
+const diffs = [
+  ['fa-bolt','100% Fibra Óptica','Conexão estável do início ao fim, sem oscilações.'],
+  ['fa-shield-halved','Zero fidelidade abusiva','Contrato transparente, sem letras miúdas.'],
+  ['fa-headset','Suporte humanizado','Atendimento rápido, feito por gente de verdade.'],
+  ['fa-gamepad','Baixa latência','Ping baixo para games online e chamadas de vídeo.']
+];
+const tests = [
+  ['Ana Ferreira','Jardim das Flores','Desde que troquei pra KynnonNet não caiu nenhuma vez. Trabalho de casa e fez toda diferença.'],
+  ['Rodrigo Castro','Vila Nova','Jogo online todo dia e a latência é ótima. O suporte resolveu minha dúvida em minutos.'],
+  ['Patrícia Lima','Centro','Instalação rápida e o técnico explicou tudo direitinho. Recomendo para toda a família.'],
+  ['Marcos Silveira','Bela Vista','Já usei outras operadoras e nenhuma chegou perto da estabilidade. Sem quedas até hoje.']
+];
+const faqs = [
+  ['Como funciona a instalação?','Após contratar, um técnico agenda a visita para instalar a fibra e o roteador, geralmente em poucos dias úteis.'],
+  ['A internet tem franquia de dados?','Não. Todos os planos são ilimitados, sem redução de velocidade ao longo do mês.'],
+  ['Como recebo minha fatura mensal?','Por e-mail e na área do cliente, com pagamento via Pix, boleto ou cartão.'],
+  ['Existe fidelidade no contrato?','Trabalhamos com condições transparentes. As regras de cada campanha são informadas antes da contratação.'],
+  ['Vocês atendem a minha região?','Use o campo de CEP acima ou chame a Central Tamandaré ou Araucária pelo menu.']
+];
+const colors = ['from-kn-green to-kn-cyan','from-kn-cyan to-violet-500','from-kn-mint to-kn-green','from-kn-green to-violet-500'];
+
+/* ---------- Render: planos (links de WhatsApp saem de CONFIG.geral) ---------- */
+document.getElementById('plansGrid').innerHTML = plans.map(p => `
+  <div class="glass rounded-3xl p-7 flex flex-col relative transition duration-300 hover:-translate-y-2 hover:border-kn-green/70 ${p.hot ? 'border-2 border-kn-green shadow-[0_0_35px_rgba(16,185,129,.35)] lg:-translate-y-3' : ''}">
+    ${p.badge ? `<span class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r ${p.badge[1]} text-xs font-extrabold px-4 py-1.5 rounded-full whitespace-nowrap">${p.badge[0]}</span>` : ''}
+    <h3 class="font-display font-extrabold text-4xl">${p.mb} <span class="text-lg text-gray-400 font-semibold">Mega</span></h3>
+    <div class="my-5"><span class="text-gray-400 text-sm">R$</span> <span class="text-4xl font-extrabold">${p.price}</span><span class="text-gray-400 text-sm"> /mês</span></div>
+    <ul class="space-y-3 text-sm text-gray-300 flex-1">${p.f.map(x => `<li class="flex gap-2"><i class="fa-solid fa-check text-kn-mint mt-1"></i><span>${x}</span></li>`).join('')}</ul>
+    <a target="_blank" rel="noopener" href="${wa(CONFIG.geral, `Olá, quero contratar o plano de ${p.mb} Mega da KynnonNet`)}" class="mt-7 text-center font-extrabold py-3.5 rounded-xl transition ${p.hot ? 'bg-gradient-to-r from-kn-green to-kn-cyan text-black' : 'bg-white/10 hover:bg-white/20'}">${p.cta}</a>
+  </div>`).join('');
+
+document.getElementById('diffGrid').innerHTML = diffs.map(d => `
+  <div class="glass rounded-3xl p-6 text-center transition hover:-translate-y-2 hover:border-kn-cyan/60">
+    <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-kn-green/15 text-kn-mint text-2xl flex items-center justify-center"><i class="fa-solid ${d[0]}"></i></div>
+    <h3 class="font-bold text-lg mb-1">${d[1]}</h3><p class="text-gray-400 text-sm">${d[2]}</p>
+  </div>`).join('');
+
+document.getElementById('testGrid').innerHTML = tests.map((t, i) => `
+  <div class="glass rounded-3xl p-6 flex flex-col gap-3">
+    <div class="text-yellow-400 text-sm" aria-label="Nota 5 de 5">${'<i class="fa-solid fa-star"></i>'.repeat(5)}</div>
+    <p class="text-sm text-gray-200">“${t[2]}”</p>
+    <div class="flex items-center gap-3 mt-auto">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br ${colors[i]} text-black font-extrabold flex items-center justify-center text-sm">${t[0].split(' ').map(n => n[0]).join('')}</div>
+      <div><p class="font-bold text-sm">${t[0]}</p><p class="text-xs text-gray-400">${t[1]}</p></div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('faqList').innerHTML = faqs.map(f => `
+  <div class="glass rounded-2xl overflow-hidden">
+    <button onclick="toggleFaq(this)" class="w-full text-left p-5 font-bold flex justify-between items-center hover:text-kn-mint transition"><span>${f[0]}</span><i class="fa-solid fa-chevron-down text-kn-mint transition-transform duration-300"></i></button>
+    <div class="hidden px-5 pb-5 text-gray-400 text-sm leading-relaxed">${f[1]}</div>
+  </div>`).join('');
+
+function toggleFaq(btn){
+  btn.nextElementSibling.classList.toggle('hidden');
+  btn.querySelector('i').classList.toggle('rotate-180');
+}
+
+/* ---------- Hero: contadores animados (download, upload, ping, estabilidade) ---------- */
+const statDefs = [['Download','Mbps',500,0],['Upload','Mbps',500,0],['Ping','ms',3,0],['Estabilidade','%',99.9,1]];
+const statsEl = document.getElementById('stats');
+statsEl.innerHTML = statDefs.map((s, i) => `
+  <div class="glass rounded-2xl p-3 sm:p-4 border-kn-green/30">
+    <span class="stat font-display font-extrabold text-2xl sm:text-3xl ${i === 3 ? 'text-kn-cyan' : 'text-kn-mint'} block" data-i="${i}">0</span>
+    <span class="text-[10px] sm:text-xs text-gray-400 font-semibold">${s[0]} (${s[1]})</span>
+  </div>`).join('');
+(function countUp(){
+  const t0 = performance.now(), dur = 1800;
+  const tick = now => {
+    const k = Math.min((now - t0) / dur, 1), e = 1 - Math.pow(1 - k, 3);
+    document.querySelectorAll('.stat').forEach(el => {
+      const [, , target, dec] = statDefs[el.dataset.i];
+      el.textContent = (target * e).toFixed(dec).replace('.', ',');
+    });
+    if (k < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
+
+/* ---------- Simulador de plano ---------- */
+const ppl = document.getElementById('ppl'), pplOut = document.getElementById('pplOut'), simResult = document.getElementById('simResult');
+function simulate(){
+  pplOut.textContent = ppl.value;
+  const use = [...document.querySelectorAll('.sim:checked')].map(c => c.value);
+  const score = ppl.value * 40 + (use.includes('game') ? 120 : 0) + (use.includes('k4') ? 100 : 0) + (use.includes('work') ? 80 : 0);
+  const p = score <= 120 ? plans[0] : score <= 240 ? plans[1] : score <= 420 ? plans[2] : plans[3];
+  simResult.innerHTML = `
+    <div><p class="text-xs text-gray-400">Recomendamos</p><p class="font-display font-extrabold text-3xl text-kn-mint">${p.mb} Mega <span class="text-base text-gray-300">por R$ ${p.price}/mês</span></p></div>
+    <a target="_blank" rel="noopener" href="${wa(CONFIG.geral, `Olá, o simulador recomendou o plano de ${p.mb} Mega. Quero contratar!`)}" class="bg-gradient-to-r from-kn-green to-kn-cyan text-black font-extrabold px-6 py-3 rounded-xl whitespace-nowrap">Contratar ${p.mb} Mega</a>`;
+}
+ppl.addEventListener('input', simulate);
+document.querySelectorAll('.sim').forEach(c => c.addEventListener('change', simulate));
+simulate();
+
+/* ---------- Cobertura + modal (simulação, sem backend) ---------- */
+const modal = document.getElementById('modal');
+
+/* CIDADES ATENDIDAS — EDITE AQUI para liberar novas cidades (sem acento, minúsculas) */
+const CIDADES_ATENDIDAS = {
+  'almirante tamandare': 'tamandare',  // usa o WhatsApp da Central Tamandaré
+  'araucaria': 'araucaria'             // usa o WhatsApp da Central Araucária
+};
+const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+function showResult(ok, title, msg, link, label){
+  document.getElementById('modalIcon').className = 'text-5xl ' + (ok ? 'text-kn-mint' : 'text-kn-red');
+  document.getElementById('modalIcon').innerHTML = `<i class="fa-solid ${ok ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>`;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  const btn = document.getElementById('modalWa');
+  btn.href = link; btn.textContent = label;
+  modal.classList.remove('hidden');
+}
+
+// Máscara simples: 00000-000
+document.getElementById('cep').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g, '').slice(0, 8);
+  e.target.value = d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d;
+});
+
+document.getElementById('cepForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const cep = document.getElementById('cep').value.replace(/\D/g, '');
+  const btn = document.getElementById('cepBtn');
+  if (cep.length !== 8) {
+    return showResult(false, 'CEP inválido', 'Digite um CEP com 8 números para consultar.', wa(CONFIG.geral, 'Olá, preciso de ajuda para consultar a cobertura'), 'Falar no WhatsApp');
+  }
+  btn.disabled = true; btn.textContent = 'Consultando...';
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const d = await r.json();
+    if (d.erro) {
+      showResult(false, 'CEP não encontrado', 'Não localizamos esse CEP. Confira os números ou fale com a gente.', wa(CONFIG.geral, `Olá, não consegui consultar o CEP ${cep}`), 'Falar no WhatsApp');
+    } else {
+      const central = d.uf === 'PR' ? CIDADES_ATENDIDAS[norm(d.localidade)] : null;
+      if (central) {
+        showResult(true, 'Boa notícia!', `A KynnonNet atende ${d.localidade}${d.bairro ? ' (' + d.bairro + ')' : ''}. Fale com a central e agende sua instalação.`, wa(CONFIG[central], `Olá, consultei o CEP ${cep} em ${d.localidade} e quero assinar a KynnonNet`), 'Falar com a Central');
+      } else {
+        showResult(false, 'Ainda não chegamos aí', `No momento atendemos apenas Almirante Tamandaré e Araucária. ${d.localidade ? 'Seu CEP é de ' + d.localidade + '.' : ''} Deixe seu contato e avisamos quando chegar.`, wa(CONFIG.geral, `Olá, meu CEP ${cep} (${d.localidade || 'sua região'}) ainda não tem cobertura. Podem me avisar quando chegar?`), 'Quero ser avisado');
+      }
+    }
+  } catch (err) {
+    showResult(false, 'Não foi possível consultar', 'Verifique sua conexão e tente novamente, ou fale direto com a gente.', wa(CONFIG.geral, `Olá, quero consultar a cobertura do CEP ${cep}`), 'Falar no WhatsApp');
+  }
+  btn.disabled = false; btn.textContent = 'Verificar';
+});
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
+
+/* ---------- PWA: service worker real + prompt de instalação ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+let deferredPrompt;
+const pwaBanner = document.getElementById('pwaBanner'), navPwa = document.getElementById('navPwa');
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  pwaBanner.classList.remove('hidden'); navPwa.classList.remove('hidden');
+});
+function installPwa(){
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => { deferredPrompt = null; pwaBanner.classList.add('hidden'); navPwa.classList.add('hidden'); });
+}
+
+/* ---------- Canvas de fundo: pulsos de fibra + névoa ---------- */
+const cv = document.getElementById('bg'), cx = cv.getContext('2d');
+let W, H;
+const size = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
+size(); addEventListener('resize', size);
+const pal = ['#10B981','#06b6d4','#34d399','#8b5cf6','#EF4444'];
+const fog = Array.from({ length: 18 }, () => ({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, r: 60 + Math.random()*90, dx: Math.random()*.4-.2, dy: Math.random()*.2-.1, a: .04 + Math.random()*.08, c: pal[Math.floor(Math.random()*4)] }));
+const pulses = Array.from({ length: 16 }, () => ({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, len: 80 + Math.random()*140, v: 2 + Math.random()*4, c: pal[Math.floor(Math.random()*3)] }));
+function frame(){
+  cx.clearRect(0, 0, W, H);
+  fog.forEach(f => {
+    f.x += f.dx; f.y += f.dy;
+    if (f.x < -150 || f.x > W+150 || f.y < -150 || f.y > H+150) { f.x = Math.random()*W; f.y = Math.random()*H; }
+    const g = cx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
+    g.addColorStop(0, f.c); g.addColorStop(1, 'transparent');
+    cx.globalAlpha = f.a; cx.fillStyle = g; cx.beginPath(); cx.arc(f.x, f.y, f.r, 0, 7); cx.fill();
+  });
+  cx.globalAlpha = 1;
+  pulses.forEach(p => {
+    p.x += p.v; p.y -= p.v * .35;
+    if (p.x - p.len > W || p.y < -50) { p.x = -p.len; p.y = Math.random()*H; }
+    const g = cx.createLinearGradient(p.x - p.len, p.y + p.len*.35, p.x, p.y);
+    g.addColorStop(0, 'transparent'); g.addColorStop(1, p.c);
+    cx.strokeStyle = g; cx.lineWidth = 2; cx.lineCap = 'round';
+    cx.beginPath(); cx.moveTo(p.x - p.len, p.y + p.len*.35); cx.lineTo(p.x, p.y); cx.stroke();
+  });
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(frame);
+}
+frame();
+</script>
+</body>
+</html>
