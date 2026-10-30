@@ -218,18 +218,25 @@
    ============================================================= */
 const CONFIG = {
   geral:     '5541997169772',  // WhatsApp principal (planos, modal, rodapé)
-  tamandare: '5541997169772',  // Botão "Central Tamandaré" (menu hambúrguer e rodapé)
-  araucaria: '5541997169772',   // Botão "Central Araucária" (menu hambúrguer e rodapé)
+  tamandare: 'https://kynnonnet.beesweb.com.br/login',  // Botão "Central Tamandaré" (menu hambúrguer e rodapé)
+  araucaria: 'https://kynnonnetcapela.beesweb.com.br/login',   // Botão "Central Araucária" (menu hambúrguer e rodapé)
 };
 const wa = (num, msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
 
 // Aplica os links das centrais em todo elemento com data-central
+// Aplica os links das centrais em todo elemento com data-central
 document.querySelectorAll('[data-central]').forEach(a => {
   const k = a.dataset.central;
-  const nome = { geral:'a KynnonNet', tamandare:'a Central Tamandaré', araucaria:'a Central Araucária' }[k];
-  a.href = wa(CONFIG[k], `Olá, quero falar com ${nome}`);
+  
+  if (k === 'geral') {
+    // Mantém o WhatsApp apenas para o geral
+    const nome = 'a KynnonNet';
+    a.href = wa(CONFIG[k], `Olá, quero falar com ${nome}`);
+  } else {
+    // Usa a URL direta cadastrada no CONFIG para tamandare e araucaria
+    a.href = CONFIG[k];
+  }
 });
-
 /* ---------- Menu hambúrguer ---------- */
 const mobileMenu = document.getElementById('mobileMenu');
 document.getElementById('menuBtn').addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
