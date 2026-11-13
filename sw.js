@@ -1,6 +1,6 @@
 // Service Worker KynnonNet: abre offline com a última versão carregada
 const CACHE = 'kynnonnet-v1';
-const SHELL = ['./', './index.html', './icon.svg', './manifest.json'];
+const SHELL = ['./', './index.html', './icon.png', './manifest.json'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
 self.addEventListener('fetch', e => {
